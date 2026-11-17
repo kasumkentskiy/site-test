@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f2742">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>Латинский</title>
+<style>
+  :root{
+    --accent:#c084fc;
+    --bg1:#0b1023; --bg2:#141b38; --text:#e7ecf7; --muted:#9aa5c0;
+    --card:rgba(255,255,255,.05); --line:rgba(255,255,255,.12);
+    --ok:#16a34a; --bad:#ef4444; --pick:#3b82f6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    min-height:100vh;font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1000px 600px at 15% -10%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 60%),
+      radial-gradient(800px 500px at 95% 110%, rgba(74,222,128,.10), transparent 60%),
+      linear-gradient(160deg,var(--bg1) 0%,var(--bg2) 100%);
+    background-attachment:fixed;
+    padding:28px 16px 60px;display:flex;flex-direction:column;align-items:center;
+  }
+  .wrap{width:100%;max-width:760px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px}
+  .back{color:var(--muted);text-decoration:none;font-size:14px;border:1px solid var(--line);
+        padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.04)}
+  .back:hover{color:var(--text)}
+  h1{font-size:clamp(22px,4vw,32px);letter-spacing:-.02em;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+  .progress{height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:8px}
+  .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#4ade80);transition:width .25s}
+  .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;
+        backdrop-filter:blur(8px);box-shadow:0 12px 40px rgba(0,0,0,.25)}
+  .qnum{font-size:13px;color:var(--muted);margin-bottom:8px}
+  .qtext{font-size:17px;line-height:1.45;margin-bottom:18px}
+  .opt{display:block;width:100%;text-align:left;margin-bottom:10px;padding:14px 16px;border-radius:12px;
+       border:1px solid var(--line);background:rgba(255,255,255,.045);color:var(--text);
+       font-size:15px;line-height:1.35;cursor:pointer;transition:.15s;font-family:inherit}
+  .opt:hover:not(:disabled){background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.25)}
+  .opt:disabled{cursor:default}
+  .opt.ok{background:rgba(22,163,74,.22);border-color:var(--ok)}
+  .opt.bad{background:rgba(239,68,68,.18);border-color:var(--bad)}
+  .opt.picked{background:rgba(59,130,246,.20);border-color:var(--pick)}
+  .opt .mark{float:right;font-weight:700;margin-left:8px}
+  .row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+  .btn{border:0;border-radius:12px;padding:12px 20px;font-size:15px;font-weight:600;cursor:pointer;
+       background:var(--accent);color:#0b1023;font-family:inherit}
+  .btn.ghost{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .hint{font-size:13px;color:var(--muted)}
+  .menu .btn{display:block;width:100%;margin-bottom:12px;padding:16px 20px;text-align:left}
+  .menu .btn small{display:block;font-weight:400;font-size:12px;opacity:.75;margin-top:4px}
+  .result{text-align:center}
+  .result .score{font-size:44px;font-weight:800;margin:14px 0;color:var(--accent)}
+  .result .pct{font-size:16px;color:var(--muted);margin-bottom:18px}
+  .review{text-align:left;margin-top:18px}
+  .review h3{font-size:15px;margin-bottom:10px;color:var(--muted)}
+  .review .item{border-left:3px solid var(--bad);padding:8px 12px;margin-bottom:10px;background:rgba(239,68,68,.07);border-radius:0 10px 10px 0}
+  .review .item .q{font-size:14px;margin-bottom:4px}
+  .review .item .a{font-size:13px;color:#fca5a5}
+  .review .item .b{font-size:13px;color:#86efac}
+  .jumpbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+  .jumpbar input{width:120px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
+                 background:rgba(255,255,255,.05);color:var(--text);font-family:inherit;font-size:14px}
+  .jumpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px;
+            max-height:250px;overflow-y:auto;padding:10px;margin-bottom:12px;border-radius:14px;
+            background:rgba(255,255,255,.04);border:1px solid var(--line)}
+  .jumpgrid button{padding:8px 0;border-radius:8px;border:1px solid var(--line);
+                   background:rgba(255,255,255,.05);color:var(--text);font-size:12px;cursor:pointer;font-family:inherit}
+  .jumpgrid button:hover{background:rgba(255,255,255,.12)}
+  .jumpgrid button.cur{background:var(--accent);color:#0b1023;font-weight:700}
+  .jumpgrid button.done{opacity:.5}
+  @media(max-width:520px){
+    body{padding:18px 10px 44px}
+    h1{font-size:22px}
+    .sub{font-size:13px;margin-bottom:14px}
+    .card{padding:16px;border-radius:14px}
+    .qtext{font-size:16px;line-height:1.4}
+    .opt{font-size:14.5px;padding:13px 14px;margin-bottom:8px}
+    .btn{padding:12px 16px;font-size:14px}
+    .jumpbar{gap:6px}
+    .jumpbar input{width:88px;font-size:14px}
+    .jumpbar .hint{font-size:11px;flex-basis:100%}
+    .jumpgrid{grid-template-columns:repeat(auto-fill,minmax(44px,1fr));max-height:200px}
+    .meta{font-size:12px}
+    .review .item .q{font-size:13.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="back" href="index.html">← Все предметы</a>
+    <span class="hint" id="counter"></span>
+  </div>
+  <h1>Латинский</h1>
+  <div class="sub">Всего вопросов: <b>295</b></div>
+
+  <div id="menu" class="card menu">
+    <button class="btn" onclick="start('train')">🎯 Тренировка — все 295<small>Сразу видно правильный ответ, переход через 1 сек</small></button>
+    <button class="btn ghost" onclick="start('exam')">📝 Экзамен — 20 случайных<small>Как на экзамене: результат и разбор ошибок в конце</small></button>
+  </div>
+
+  <div id="quiz" style="display:none">
+    <div class="jumpbar">
+      <button class="btn ghost" id="toggleJump">📋 Список вопросов</button>
+      <input id="jumpNum" type="number" min="1" placeholder="№ вопроса">
+      <button class="btn ghost" id="goNum">→</button>
+      <span class="hint">можно перейти к любому вопросу</span>
+    </div>
+    <div class="jumpgrid" id="jumpgrid" style="display:none"></div>
+    <div class="progress"><i id="pbar"></i></div>
+    <div class="meta"><span id="qpos"></span><span id="score"></span></div>
+    <div class="card" id="card"></div>
+    <div class="row">
+      <button class="btn" id="next" disabled>Далее →</button>
+      <span class="hint" id="status"></span>
+    </div>
+  </div>
+
+  <div id="done" style="display:none" class="card result">
+    <h2>Результат</h2>
+    <div class="score" id="finalScore">0</div>
+    <div class="pct" id="finalPct"></div>
+    <div class="review" id="review"></div>
+    <div class="row" style="justify-content:center;margin-top:20px">
+      <button class="btn" onclick="start(mode)">Ещё раз</button>
+      <button class="btn ghost" onclick="toMenu()">К выбору режима</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {"questions": [{"num": 1, "text": "Звук “Э” на письме передается латинским гласным", "options": ["“е”", "“е” и дифтонгом “ое”", "“е” и дифтонгом ае", "“е” и дифтонгами “ае”, ”ое”"], "answer": 3}, {"num": 2, "text": "Буква “С” произносится как русское “ц” перед:", "options": ["гласными е, i, у", "дифтонгами ае, ое", "гласными а, о, u и дифтонгами ае, ое", "гласными е, i, у и дифтонгами ае, ое"], "answer": 3}, {"num": 3, "text": "Буква “С” произносится как русское “к”:", "options": ["перед а, о, u", "перед e, i, y, дифтонгами “ae”, “oe”", "в конце слова", "перед согласными e) перед а, о, u, дифтонгами “au”, “eu”, согласными и в конце слова"], "answer": 3}, {"num": 4, "text": "Буквосочетание “qu” произносится как:", "options": ["к", "ку", "кв", "кс"], "answer": 2}, {"num": 5, "text": "В термине “ethmoidalis” – “решетчатый: буквосочетание “th” произносится как:", "options": ["р", "т с) х", "ф"], "answer": 1}, {"num": 6, "text": "В термине “rachitis”- “рахит” буквосочетание “ch” произносится как:", "options": ["р", "т с) х", "ф"], "answer": 1}, {"num": 7, "text": "В термине “sphenoidalis” – “клиновидный” буквосочетание “ph” произносится как:", "options": ["р", "т с) х", "ф"], "answer": 2}, {"num": 8, "text": "В термине “rheumatismus” – “ревматизм” буквосочетание “rh” произносится как:", "options": ["р", "т с) х", "ф"], "answer": 0}, {"num": 9, "text": "Постановка ударения зависит от долготы или краткости:", "options": ["последнего слога", "предпоследнего слога", "третьего слога от конца слова", "четвертого слога от конца слова"], "answer": 1}, {"num": 10, "text": "Склонение существительного определяется по:", "options": ["окончанию именительного падежа единственного числа", "окончанию именительного падежа множественного числа", "окончанию родительного падежа единственного числа", "окончанию родительного падежа множественного числа"], "answer": 2}, {"num": 11, "text": "К какой группе антибиотиков относится препарат “Ampicillinum”?:", "options": ["макролиды", "пенициллины", "тетрациклины", "цефалоспорины"], "answer": 1}, {"num": 12, "text": "Укажите названия антибиотиков, включающих частотный отрезок “cyclin”:", "options": ["макролиды", "пенициллины", "тетрациклины", "цефалоспорины"], "answer": 2}, {"num": 13, "text": "Укажите названия антибиотиков, включающих частотный отрезок “mycin”:", "options": ["макролиды", "пенициллины", "тетрациклины", "цефалоспорины"], "answer": 0}, {"num": 14, "text": "Укажите названия антибиотиков, включающих частотный отрезок “ ceph”:", "options": ["макролиды", "пенициллины", "тетрациклины", "цефалоспорины"], "answer": 3}, {"num": 15, "text": "Выберите антибиотик, продуцируемый штаммом “Streptomyces”:", "options": ["Azlocillinum", "Cefotaximum", "Kanamycinum", "Methacyclinum"], "answer": 2}, {"num": 16, "text": "Выберите антибиотик из группы тетрациклина:", "options": ["Ampicillinum", "Clindamycinum", "Doxycyclinum", "Gentamycinum"], "answer": 2}, {"num": 17, "text": "К какой группе антибиотиков относится препарат “лонгацеф”:", "options": ["макролиды", "пенициллины", "тетрациклины", "цефалоспорины"], "answer": 3}, {"num": 18, "text": "Какое действие оказывает препарат “гельминтокс”?:", "options": ["противовирусное", "противогрибковое", "противоглистное", "противомалярийное"], "answer": 2}, {"num": 19, "text": "Ацикловир оказывает действие:", "options": ["противовирусное", "противомикозное", "противоглистное", "противомалярийное"], "answer": 0}, {"num": 20, "text": "В каком термине содержится значение “противогнилостный”:", "options": ["antibioticus", "antisepticus", "bactericidus", "fungicidus"], "answer": 1}, {"num": 21, "text": "Выберите противогрибковое средство:", "options": ["Acyclovirum", "Myconazolum", "Phthivazidum", "Vermox"], "answer": 1}, {"num": 22, "text": "В каком термине содержится значение “болеутоляющий”:", "options": ["analgeticus", "anaestheticus", "analepticus", "antisepticus"], "answer": 0}, {"num": 23, "text": "Названия местных анестетиков включают частотный отрезок:", "options": ["– alg", "– cain", "– dol", "– sed"], "answer": 1}, {"num": 24, "text": "Местные анестетики оказывают действие:", "options": ["жаропонижающее", "желчегонное", "обезболивающее", "снотворное"], "answer": 2}, {"num": 25, "text": "Названия жаропонижающих средств включают частотный отрезок:", "options": ["– alg", "– cain", "– pyr", "– sed"], "answer": 2}, {"num": 26, "text": "Укажите значение частотного отрезка “chol”:", "options": ["анальгетическое", "жаропонижающее", "желчегонное", "мочегонное"], "answer": 2}, {"num": 27, "text": "Какое значение имеют частотные отрезки “cor”, “card”?:", "options": ["желчегонное", "снотворное", "седативное", "сердечное"], "answer": 3}, {"num": 28, "text": "Выберите желчегонное средство:", "options": ["Aethimizolum", "Cholenzym", "Gastalum", "Panzynorm"], "answer": 1}, {"num": 29, "text": "Промедол оказывает действие:", "options": ["анальгетическое", "аналептическое", "жаропонижающее", "противовоспалительное"], "answer": 0}, {"num": 30, "text": "В каком термине содержится значение “жаропонижающий”?:", "options": ["analgeticus", "antibioticus", "antipyreticus", "antisepticus"], "answer": 2}, {"num": 31, "text": "В каком термине содержится значение “успокаивающий”?:", "options": ["analgeticus", "anaestheticus", "analepticus", "sedativus e) spasmolyticus"], "answer": 3}, {"num": 32, "text": "Выберите препарат, оказывающий влияние на сердечную мышцу:", "options": ["Abominum", "Corinfar", "Panzynorm", "Seduxenum"], "answer": 1}, {"num": 33, "text": "Укажите значение частотного отрезка “azid”:", "options": ["азотсодержащий", "йодосодрежащий", "кислородсодержащий", "серосодержащий"], "answer": 0}, {"num": 34, "text": "Гипотензивные средства:", "options": ["оказывают снотворное действие", "оказывают успокаивающее действие", "повышают артериальное давление", "понижают артериальное давление"], "answer": 3}, {"num": 35, "text": "Гипотензивные препараты содержат частотный отрезок:", "options": ["– cain", "– dol", "– press", "– sed"], "answer": 2}, {"num": 36, "text": "Апрессин оказывает действие:", "options": ["бронхолитическое", "гипертензивное", "гипотензивное", "желчегонное"], "answer": 2}, {"num": 37, "text": "Выберите гипотензивное средство из группы ингибиторов АПФ:", "options": ["Amlodipinum", "Captoprilum", "Hydralazinum", "Indapamidum"], "answer": 1}, {"num": 38, "text": "Укажите значение термина “haemostaticus”:", "options": ["гипотензивный", "желчегонный", "кровоостанавливающий", "мочегонный"], "answer": 2}, {"num": 39, "text": "В названии, каких групп встречается частотный отрезок “oestr”?", "options": ["препараты женских половых гормонов", "препараты мужских половых гормонов", "препараты гормонов щитовидной железы", "препараты гормонов поджелудочной железы"], "answer": 0}, {"num": 40, "text": "В названии, каких групп встречаются частотные отрезки “test”, “andr”?:", "options": ["препараты гормонов щитовидной железы", "препараты гормонов коры надпочечников", "препараты женских половых гормонов", "препараты мужских половых гормонов"], "answer": 3}, {"num": 41, "text": "Кортикостероиды - это препараты:", "options": ["гормонов коры надпочечников", "гормонов щитовидной железы", "женских половых гормонов", "мужских половых гормонов"], "answer": 0}, {"num": 42, "text": "В названии, каких групп, встречается частотный отрезок“thyr”?:", "options": ["препараты женских половых гормонов", "препараты мужских половых гормонов", "препараты гормонов щитовидной железы", "препараты гормонов поджелудочной железы"], "answer": 2}, {"num": 43, "text": "Прогестерон - это препарат:", "options": ["гормонов коры надпочечников", "гормонов щитовидной железы", "женских половых гормонов", "жужских половых гормонов"], "answer": 2}, {"num": 44, "text": "Андрогенные стероиды - это препараты:", "options": ["гормонов коры надпочечников", "гормонов щитовидной железы", "женских половых гормонов", "мужских половых гормонов"], "answer": 3}, {"num": 45, "text": "Выберите препарат мужских половых гормонов:", "options": ["Methyloestradiolum", "Prednisolonum", "Phenobolilum", "Testoenatum"], "answer": 3}, {"num": 46, "text": "Выберите препарат гормонов щитовидной железы:", "options": ["Ciproteronum", "Euthyrox", "Dexamethazonum", "Desaminooxytocinum"], "answer": 1}, {"num": 47, "text": "Лекарственное средство, понижающее содержание сахара в крови:", "options": ["Remedium haemostaticum", "Remedium hyperglycaemicum", "Remedium hypoglycaemicum", "Remedium thyreostaticum"], "answer": 2}, {"num": 48, "text": "Характер терапевтического действия сбора “speciescholagogae”:", "options": ["аппетитный", "диуретический", "желчегонный", "слабительный"], "answer": 2}, {"num": 49, "text": "Характер терапевтического действия сбора “speciespectorales”:", "options": ["диуретический", "желчегонный", "отхаркивающий", "успокаивающий"], "answer": 2}, {"num": 50, "text": "Характер терапевтического действия сбора “speciesdiureticae”:", "options": ["желчегонный", "мочегонный", "отхаркивающий", "слабительный"], "answer": 1}, {"num": 51, "text": "Латинская часть рецепта всегда начинается с глагола:", "options": ["Misce", "Da", "Recipe", "Signa"], "answer": 2}, {"num": 52, "text": "Латинская часть рецепта всегда заканчивается глаголом:", "options": ["Recipe", "Da", "Misce", "Signa"], "answer": 3}, {"num": 58, "text": "Укажите значение приставки “an”:", "options": ["движение назад", "затруднение", "избавление", "отрицание"], "answer": 3}, {"num": 59, "text": "Укажите значение приставки “anti”:", "options": ["между, меж", "под, ниже", "против", "отрицание"], "answer": 2}, {"num": 60, "text": "Укажите значение приставки “dys”:", "options": ["избавление", "против", "нарушение", "отрицание"], "answer": 2}, {"num": 61, "text": "Укажите значение приставки “de”, “des”:", "options": ["вне, снаружи", "затруднение", "избавление", "отрицание"], "answer": 2}, {"num": 62, "text": "Укажите значение приставки “endo”:", "options": ["внутри", "вне, снаружи", "под", "на, над"], "answer": 0}, {"num": 63, "text": "Укажите значение приставки “ecto”:", "options": ["затруднение", "сверх, выше", "вне, снаружи", "под"], "answer": 2}, {"num": 64, "text": "Укажите значение приставки “epi”:", "options": ["вне, снаружи", "внутри", "на, над", "под"], "answer": 2}, {"num": 65, "text": "Укажите значение приставки “exo”:", "options": ["вне, снаружи", "затруднение", "на, над", "отрицание"], "answer": 0}, {"num": 66, "text": "Укажите значение приставки “hypo”:", "options": ["вне, снаружи", "под, ниже", "сверх, выше", "меж, между"], "answer": 1}, {"num": 67, "text": "Укажите значение приставки “hyper”:", "options": ["вне, снаружи", "под, ниже", "сверх, выше", "меж, между"], "answer": 2}, {"num": 68, "text": "Укажите значение приставки “infra”:", "options": ["вне, снаружи", "меж, между", "на, над", "под"], "answer": 3}, {"num": 69, "text": "Укажите значение приставки “intra”:", "options": ["вокруг", "внутри", "меж, между", "на, над"], "answer": 1}, {"num": 70, "text": "Укажите значение приставки “mes”:", "options": ["с, вместе с", "находящийся в середине между", "на, над", "около"], "answer": 1}, {"num": 71, "text": "Укажите значение приставки “para”:", "options": ["вокруг", "внутри", "на, над", "около"], "answer": 3}, {"num": 72, "text": "Укажите значение приставки “peri”:", "options": ["вокруг", "внутри", "на, над", "около"], "answer": 0}, {"num": 73, "text": "Укажите значение приставки “re”:", "options": ["движение назад", "затруднение", "отрицание", "удаление"], "answer": 0}, {"num": 74, "text": "Укажите значение приставки “sub”:", "options": ["над, сверх", "под", "под, ниже", "меж, между"], "answer": 2}, {"num": 75, "text": "Укажите значение приставки “trans”:", "options": ["внутри", "меж, между", "под", "через"], "answer": 3}, {"num": 76, "text": "Какое значение имеет словообразовательный элемент “graphia”?:", "options": ["измерение", "изображение", "осмотр", "лечение"], "answer": 1}, {"num": 77, "text": "Какое значение имеет словообразовательный элемент “scopia”?:", "options": ["вскрытие", "изображение", "наблюдение", "напряжение"], "answer": 2}, {"num": 78, "text": "Какое значение имеет словообразовательный элемент “metria”?:", "options": ["измерение", "изображение", "осмотр", "отверстие"], "answer": 0}, {"num": 79, "text": "Какое значение имеет словообразовательный элемент “logia”?:", "options": ["болезнь", "лечение", "наука, учение", "осмотр"], "answer": 2}, {"num": 80, "text": "Какое значение имеет словообразовательный элемент “pathia”?:", "options": ["болезнь", "осмотр", "ощущение", "напряжение"], "answer": 0}, {"num": 81, "text": "Какое значение имеет словообразовательный элемент “algia”:", "options": ["боль", "жар", "ощущение", "тепло"], "answer": 0}, {"num": 82, "text": "Какое значение имеет словообразовательный элемент“ectasia”:", "options": ["сжатие", "сужение", "расширение", "удаление"], "answer": 2}, {"num": 83, "text": "Какое значение имеет словообразовательный элемент “penia”?:", "options": ["боязнь", "склонность", "пониженное содержание", "формирование"], "answer": 2}, {"num": 84, "text": "Какое значение имеет словообразовательный элемент“plasia”?:", "options": ["боязнь", "склонность", "формирование", "удар"], "answer": 2}, {"num": 85, "text": "Какое значение имеет словообразовательный элемент “plegia”?:", "options": ["изображение", "расширение", "иссечение", "удар"], "answer": 3}, {"num": 86, "text": "Какое значение имеет словообразовательный элемент“phobia”?:", "options": ["склонность", "боязнь", "болезнь", "разрез"], "answer": 1}, {"num": 87, "text": "Какое значение имеет словообразовательный элемент “philia”?:", "options": ["недостаток", "боязнь", "склонность", "исследование"], "answer": 2}, {"num": 88, "text": "Какое значение имеют словообразовательные элементы “haem”, “aemia”, haemat?:", "options": ["кровь", "почка", "сустав", "хрящ"], "answer": 0}, {"num": 89, "text": "Какое значение имеет словообразовательный элемент “malacia”?:", "options": ["красный", "мягкий", "твердый", "черный"], "answer": 1}, {"num": 90, "text": "Какое значение имеет словообразовательный элемент “thermia”?:", "options": ["напряжение", "недостаток", "тепло", "формирование"], "answer": 2}, {"num": 91, "text": "Какое значение имеет словообразовательный элемент “tomia”?:", "options": ["разрез", "удаление", "отверстие", "шов"], "answer": 0}, {"num": 92, "text": "Какое значение имеет словообразовательный элемент“ectomia”?:", "options": ["разрез", "иссечение, вырезание, удаление", "сужение", "сжатие"], "answer": 1}, {"num": 93, "text": "Какое значение имеет словообразовательный элемент “stomia”?:", "options": ["удаление", "расширение", "рассечение", "отверстие"], "answer": 3}, {"num": 94, "text": "Какое значение имеет словообразовательный элемент“rrhaphia”?:", "options": ["кровотечение", "формирование", "удаление", "наложение шва на рану"], "answer": 3}, {"num": 95, "text": "Найдите термин, обозначающий “кровотечение”:", "options": ["graphia", "rrhaphia", "rrhagia", "phagia"], "answer": 2}, {"num": 96, "text": "Какое значение имеет словообразовательный элемент“cyst”?:", "options": ["влагалище", "кишка", "молочная железа", "позвонок e) пузырь"], "answer": 3}, {"num": 97, "text": "Какое значение имеет словообразовательный элемент“enter”?:", "options": ["влагалище", "кишка", "желудок", "сердце"], "answer": 1}, {"num": 98, "text": "Какое значение имеет словообразовательный элемент“spondyl”?:", "options": ["вена", "веко", "позвонок", "пупок"], "answer": 2}, {"num": 99, "text": "Какое значение имеет словообразовательный элемент“dactyl”?:", "options": ["матка", "палец", "позвонок", "яичник"], "answer": 1}, {"num": 100, "text": "Какое значение имеет словообразовательный элемент“col”?:", "options": ["прямая кишка", "слепая кишка", "толстая кишка", "подвздошная"], "answer": 2}, {"num": 101, "text": "Какое значение имеет словообразовательный элемент “colp”?:", "options": ["влагалище", "матка", "толстая кишка", "тонкая кишка"], "answer": 0}, {"num": 102, "text": "Какое значение имеет словообразовательный элемент“my”?:", "options": ["глаз", "кишка", "мышца", "нерв"], "answer": 2}, {"num": 103, "text": "Какое значение имеет словообразовательный элемент“omphal”?:", "options": ["глаз", "матка", "пупок", "яичник"], "answer": 2}, {"num": 104, "text": "Какое значение имеет словообразовательный элемент“oophor”?:", "options": ["влагалище", "матка", "мочевой пузырь", "яичник"], "answer": 3}, {"num": 105, "text": "Какое значение имеют словообразовательные элементы“hyster”, “metr”?:", "options": ["влагалище", "матка", "маточная труба", "яичник"], "answer": 1}, {"num": 106, "text": "Какое значение имеет словообразовательный элемент“salping”?:", "options": ["влагалище", "матка", "маточная труба", "яичник"], "answer": 2}, {"num": 107, "text": "Какое значение имеет словообразовательный элемент “ mast”?:", "options": ["матка", "молочная железа", "пупок", "яичник"], "answer": 1}, {"num": 108, "text": "Какое значение имеет словообразовательный элемент “phleb”?:", "options": ["вена", "веко", "глаз", "нос"], "answer": 0}, {"num": 109, "text": "Какое значение имеет словообразовательный элемент “ophthalm”?:", "options": ["веко", "глаз", "нос", "ухо"], "answer": 1}, {"num": 110, "text": "Какое значение имеет словообразовательный элемент “bleph”?:", "options": ["веко", "глаз", "нос", "ухо"], "answer": 0}, {"num": 111, "text": "Какое значение имеет словообразовательный элемент “rhin”?:", "options": ["веко", "глаз", "нос", "ухо"], "answer": 2}, {"num": 112, "text": "Какое значение имеет словообразовательный элемент “ot”?:", "options": ["веко", "глаз", "нос", "ухо"], "answer": 3}, {"num": 113, "text": "Какое значение имеет словообразовательный элемент “neur”?:", "options": ["глаз", "мышца", "нерв", "нос"], "answer": 2}, {"num": 114, "text": "Какое значение имеет словообразовательный элемент “gloss”?:", "options": ["глаз", "нос", "ухо", "язык"], "answer": 3}, {"num": 115, "text": "Какое значение имеет словообразовательный элемент “kerat”?:", "options": ["веко", "глаз", "нос", "роговица"], "answer": 3}, {"num": 116, "text": "Какое значение имеет словообразовательный элемент “proct”?:", "options": ["прямая кишка", "слепая кишка", "тонкая кишка", "толстая кишка"], "answer": 0}, {"num": 117, "text": "Какое значение имеет словообразовательный элемент “gastr?:", "options": ["желудок", "матка", "почка", "сердце"], "answer": 0}, {"num": 118, "text": "Какое значение имеет словообразовательный элемент “typhl”?:", "options": ["желудок", "тонкая кишка", "толстая кишка", "слепая кишка"], "answer": 3}, {"num": 119, "text": "Какое значение имеет словообразовательный элемент “col”?:", "options": ["прямая кишка", "слепая кишка", "тонкая кишка", "толстая кишка"], "answer": 3}, {"num": 120, "text": "Какое значение имеет словообразовательный элемент“pyel”?:", "options": ["гной", "мочеточник", "почка", "почечная лоханка"], "answer": 3}, {"num": 121, "text": "Какое значение имеет словообразовательный элемент“cor”?:", "options": ["кость", "рот", "cердце", "сустав"], "answer": 2}, {"num": 122, "text": "Какое значение имеет словообразовательный элемент“ arthr”?:", "options": ["кожа", "кость", "сустав", "хрящ"], "answer": 2}, {"num": 123, "text": "Какое значение имеет словообразовательный элемент“nephr”?:", "options": ["желудок", "мышца", "сердце", "почка"], "answer": 3}, {"num": 124, "text": "Какое значение имеет словообразовательный элемент“cephal”?:", "options": ["глаз", "голова", "легкое", "почка"], "answer": 1}, {"num": 125, "text": "Какое значение имеет словообразовательный элемент “angio”?:", "options": ["кровь", "сердце", "сосуд", "сустав"], "answer": 2}, {"num": 126, "text": "Какое значение имеет словообразовательный элемент “lapar”?:", "options": ["легкое", "сердце", "стенка живота", "сосуд"], "answer": 2}, {"num": 127, "text": "Какое значение имеет словообразовательный элемент “py”?:", "options": ["голова", "гной", "почечная лоханка", "почка"], "answer": 1}, {"num": 128, "text": "Какое значение имеет словообразовательный элемент “odont”?:", "options": ["зуб", "кость", "легкое", "рот"], "answer": 0}, {"num": 129, "text": "Какое значение имеет словообразовательный элемент “osteo”?:", "options": ["кость", "рот", "зуб", "сосуд"], "answer": 0}, {"num": 130, "text": "Какое значение имеет словообразовательный элемент “chond”?”:", "options": ["кость", "рот", "cустав", "хрящ"], "answer": 3}, {"num": 131, "text": "Какое значение имеет словообразовательный элемент “pneum”?:", "options": ["живот", "железа", "легкое", "сердце"], "answer": 2}, {"num": 132, "text": "Какое значение имеет словообразовательный элемент “stomat”?:", "options": ["голова", "кость", "почка", "рот"], "answer": 3}, {"num": 133, "text": "Какое значение имеет словообразовательный элемент “dermat”?:", "options": ["кожа", "кость", "кровь", "рот"], "answer": 0}, {"num": 134, "text": "Какое значение имеет словообразовательный элемент“carcin”?:", "options": ["опухоль", "отек", "раковая опухоль", "уплотнение"], "answer": 2}, {"num": 135, "text": "Какое значение имеет словообразовательный элемент“sclero”?:", "options": ["белый", "красный", "твердый", "черный"], "answer": 2}, {"num": 136, "text": "Какое значение имеет словообразовательный элемент“melan”?:", "options": ["белый", "красный", "твердый", "черный"], "answer": 3}, {"num": 137, "text": "Какое значение имеет словообразовательный элемент“ ptosis”?:", "options": ["расширение", "смещение, опущение", "отверстие", "разрез"], "answer": 1}, {"num": 138, "text": "Какое значение имеет словообразовательный элемент“olig”?:", "options": ["большой", "все", "многочисленный", "незначительный"], "answer": 3}, {"num": 139, "text": "Какое значение имеет словообразовательный элемент“leuc”?:", "options": ["белый", "красный", "черный", "правильный"], "answer": 0}, {"num": 140, "text": "Какое значение имеет словообразовательный элемент “erythr”?:", "options": ["белый", "красный", "черный", "правильный"], "answer": 1}, {"num": 141, "text": "Найдите термин со значением «хрящевая клетка»", "options": ["myeloctus", "chondrocytus", "hepatocytus", "osteomyelocytus"], "answer": 1}, {"num": 142, "text": "Измерение физических параметров тела – это:", "options": ["craniometria", "anthropometria", "cephalometria", "somatometria"], "answer": 1}, {"num": 143, "text": "Измерение размеров головы обозначается термином:", "options": ["цефальгия", "цефалография", "цефалометрия", "энцефалит"], "answer": 2}, {"num": 144, "text": "Изображение (снимок) мочевого пузыря:", "options": ["cystalgia", "cystoscopia", "cystographia", "cystoplastica"], "answer": 2}, {"num": 145, "text": "Заболевание молочной железы:", "options": ["маммография", "мастотомия", "мастэктомия", "мастопатия"], "answer": 3}, {"num": 146, "text": "Серозная оболочка, покрывающая снаружи миокард:", "options": ["myocardium", "endocardium", "epicardium", "pericardium"], "answer": 2}, {"num": 147, "text": "Метод исследования сосудов:", "options": ["angiologia", "angiographia", "angioma", "angiectasia"], "answer": 1}, {"num": 148, "text": "Заболевание костей:", "options": ["osteolysis", "osteoma", "osteopathia", "osteomalacia"], "answer": 2}, {"num": 149, "text": "Раздел медицины, изучающий болезни уха, горла и носа:", "options": ["гастроэнтерология", "кардиология", "оториноларингология", "эндокринология"], "answer": 2}, {"num": 150, "text": "Исследование прямой кишки:", "options": ["прокторрагия", "проктальгия", "проктоскопия", "проктэктазия"], "answer": 2}, {"num": 151, "text": "Переведите термин «oncologia» -", "options": ["наука о болезнях", "наука об опухолях", "наука о процессах старения", "наука о женских болезнях"], "answer": 1}, {"num": 152, "text": "Раздел медицины, изучающий болезни зубов и полости рта:", "options": ["stomatorrhagia", "stomatographia", "stomatologia", "stomatitis"], "answer": 2}, {"num": 153, "text": "Изображение матки:", "options": ["гистероскопия", "гистерография", "гистероррагия", "гистерорафия"], "answer": 1}, {"num": 154, "text": "Рентгенография желчного пузыря:", "options": ["cholecystopathia", "cholestasis", "cholecystographia", "cholelithiasis"], "answer": 2}, {"num": 155, "text": "Инструментальный осмотр влагалища (в зеркалах):", "options": ["colpographia", "colposcopia", "colpotomia", "colpitis"], "answer": 1}, {"num": 156, "text": "Почечно-каменная болезнь:", "options": ["cystolithiasis", "nephrolithiasis", "urolithiasis"], "answer": 1}, {"num": 157, "text": "Скопление жидкости в плевральной полости:", "options": ["pneumothorax", "haemothorax", "hydrothorax", "pyothorax"], "answer": 2}, {"num": 158, "text": "Каким термином обозначается “все”:", "options": ["brachy-", "poly-", "pan-", "melan-"], "answer": 2}, {"num": 159, "text": "Укажите значение суффикса –itis?", "options": ["болезнь", "воспаление", "опухоль", "хроническое заболевание"], "answer": 1}, {"num": 160, "text": "Укажите значение суффиксов “osis”, “iasis”, “ismus”:", "options": ["болезнь", "воспаление", "опухоль", "хроническое заболевание"], "answer": 0}, {"num": 161, "text": "Укажите значение словообразовательного элемента “tachy”:", "options": ["быстрый", "медленный", "короткий", "красный"], "answer": 0}, {"num": 162, "text": "Укажите значение словообразовательного элемента “brady”:", "options": ["быстрый", "медленный", "короткий", "красный"], "answer": 1}, {"num": 163, "text": "Замедленное поглощение обозначается термином:", "options": ["афагия", "брадифагия", "дисфагия", "тахифагия"], "answer": 1}, {"num": 164, "text": "Оперативное удаление матки, маточной трубы и яичника:", "options": ["гистерэктомия", "оофорэктомия", "оофоргистерэктомия", "оофоргистерсальпингэктомия"], "answer": 3}, {"num": 165, "text": "Повышенное содержание лейкоцитов в крови:", "options": ["лейкопоэз", "лейкоз", "лейкоцитоз", "лейкемия"], "answer": 2}, {"num": 166, "text": "Хроническое заболевание печени и почек обозначается термином:", "options": ["гепатит", "нефрит", "гепатонефрит", "гепатонефроз"], "answer": 3}, {"num": 167, "text": "Воспаление тонкой и толстой кишки обозначается термином:", "options": ["энтерит", "энтероспазм", "энтеропатия", "энтероколит"], "answer": 3}, {"num": 168, "text": "Увеличение прямой кишки:", "options": ["проктит", "проктальгия", "проктомегалия", "проктоспазм"], "answer": 2}, {"num": 169, "text": "Воспаление нескольких суставов:", "options": ["артрит", "миноартрит", "олигоартрит", "полиартрит e) панартрит"], "answer": 3}, {"num": 170, "text": "Боль по ходу нерва обозначается термином:", "options": ["неврастения", "невралгия", "невротомия", "невропатология"], "answer": 1}, {"num": 171, "text": "Уменьшенные размера молочной железы:", "options": ["мастопатия", "микромастия", "макромастия", "мастотомия"], "answer": 1}, {"num": 172, "text": "Судорога прямой кишки:", "options": ["проктэктазия", "проктоспазм", "проктомегалия", "проктальгия"], "answer": 1}, {"num": 173, "text": "Кровоизлияние в глазу:", "options": ["офтальмит", "офтальмоплегия", "офтальморрагия", "офтальмоскопия"], "answer": 2}, {"num": 174, "text": "Патологическое смещение матки:", "options": ["блефароптоз", "гистероптоз", "кольпоптоз", "нефроптоз"], "answer": 1}, {"num": 175, "text": "Общее воспаление желудка:", "options": ["гастрит", "пангастрит", "перигастрит", "гастродуоденит"], "answer": 1}, {"num": 176, "text": "Незначительное выделение мочи:", "options": ["анурия", "дизурия", "олигурия", "полиурия"], "answer": 2}, {"num": 177, "text": "Наложение шва на веко обозначается термином:", "options": ["блефароптоз", "блефароспазм", "блефаропластика", "блефароррафия"], "answer": 3}, {"num": 178, "text": "Найдите термин со значением «опухоль»", "options": ["oedema", "adenoma", "glaucoma", "coma"], "answer": 1}, {"num": 179, "text": "Добавьте недостающую часть термина «боязнь воды» - … phobia:", "options": ["hydro –", "photo –", "cancero –", "aёro –"], "answer": 0}, {"num": 180, "text": "Добавьте недостающую часть термина «светобоязнь» -… phobia:", "options": ["aёro –", "cancero –", "hydro –", "photo –"], "answer": 3}, {"num": 181, "text": "Допишите недостающую часть термина nephro– опущение почки:", "options": ["–pathia", "–stomia", "–rrhagia", "–ptosis"], "answer": 3}, {"num": 182, "text": "Разрастание органа за счет его избыточного питания:", "options": ["atrophia", "dystrophia", "hypotrophia", "hypertrophia"], "answer": 3}, {"num": 183, "text": "В каких терминах содержится понятие “пониженное содержание”?:", "options": ["hyperaemia", "hypoxaemia", "lymphocytosis", "leucocitos"], "answer": 1}, {"num": 184, "text": "Застой жидкости в венах:", "options": ["cholestasis", "haemostasis", "phlebostasis", "urostasis"], "answer": 2}, {"num": 185, "text": "Раздел медицины, изучающий заболевания желудочно-кишечного тракта:", "options": ["haematologia", "pathologia", "gastroenterologia", "physiologia"], "answer": 2}, {"num": 186, "text": "Найдите перевод термина “typhlectasia”:", "options": ["оперативное вскрытие слепой кишки", "кровотечение слепой кишки", "расширение слепой кишки", "исправление слепой кишки"], "answer": 2}, {"num": 187, "text": "Выпрямление зубов:", "options": ["parodontus", "orthodontus", "orthodontia", "orthopaedia"], "answer": 2}, {"num": 188, "text": "Создание свища толстых кишок:", "options": ["colostomia", "gastrostomia", "proctostomia", "typhlostomia"], "answer": 0}, {"num": 189, "text": "Паралич мышц глаза:", "options": ["ophthalmia", "ophthalmospasmus", "ophtthalmitis", "ophthalmoplegia"], "answer": 3}, {"num": 190, "text": "Найдите перевод термина “neurasthenia”:", "options": ["воспаление нервов", "боль в области нерва", "слабость нервов", "заболевание нервов"], "answer": 2}, {"num": 191, "text": "Сужение пищевода:", "options": ["cardiostenosis", "pylorostenosis", "oesophagostenosis", "typhlostenosis"], "answer": 2}, {"num": 192, "text": "Укажите значение «гемостаз»", "options": ["кровотечение", "склонность к кровотечениям", "застой крови", "наука о болезнях крови"], "answer": 2}, {"num": 193, "text": "Склонность к кровотечению:", "options": ["haemorrhagia", "haemophilia", "spasmophilia", "thrombophilia"], "answer": 1}, {"num": 194, "text": "Термин со значением «мочекаменная болезнь»:", "options": ["elephanthiasis", "cholelithiasis", "nephrolithiasis", "urolithiasis"], "answer": 3}, {"num": 195, "text": "Укажите значение термина «геморрагия»:", "options": ["кровотечение", "склонность к кровотечениям", "застой крови", "наука о болезнях крови"], "answer": 0}, {"num": 196, "text": "Укажите термин со значением «застой мочи»:", "options": ["haemostasis", "cholestasis", "lymphostasis", "urostasis"], "answer": 3}, {"num": 197, "text": "Паралич верхнего века:", "options": ["blepharoptosis", "gastroptosis", "hysteroptosis", "nephroptosis"], "answer": 0}, {"num": 198, "text": "Опущение матки:", "options": ["gastroptosis", "colpoptosis", "hysteroptosis", "nephroptosis"], "answer": 2}, {"num": 199, "text": "Исследование внутренних стенок носа:", "options": ["rhinographia", "rhinoscopia", "rhinolithus", "rhinoplastica"], "answer": 1}, {"num": 200, "text": "Разрыв матки:", "options": ["гистероррагия", "гистероррафия", "гистеропексия", "гистеротомия"], "answer": 0}, {"num": 201, "text": "Недостаток красных кровяных телец:", "options": ["erythrocytosis", "erythropenia", "erythropoёsis", "erythrolysis"], "answer": 1}, {"num": 202, "text": "Склонность к тромбообразованию:", "options": ["haemophilia", "thermophilia", "thrombophilia", "spasmophilia"], "answer": 2}, {"num": 203, "text": "Найдите перевод термина “osteomyelitis” – остеомиелит:", "options": ["опухоль костной ткани", "воспаление костного мозга", "заболевание спинного мозга", "воспаление спинного мозга"], "answer": 1}, {"num": 204, "text": "Инструментальное исследование желчного пузыря:", "options": ["cholecystopathia", "cholecystographia", "cholecystoscopia", "cholecystostomia"], "answer": 2}, {"num": 205, "text": "Расширение почечной лоханки:", "options": ["pyelotomia", "pyelonephritis", "pyelectasia", "pyelopmalacia"], "answer": 2}, {"num": 206, "text": "Раздел науки, изучающий заболевания женского половой сферы:", "options": ["neurologia", "oncologia", "gynaecologia", "oecologia"], "answer": 2}, {"num": 207, "text": "Увеличение размеров селезенки и печени:", "options": ["hepatomegalia", "splenomegalia", "hepatosplenomegalia", "hepatosis"], "answer": 2}, {"num": 208, "text": "Паралич кишечника:", "options": ["cystoplegia", "enteroplegia", "gastroplegia", "hysteroplegia"], "answer": 1}, {"num": 209, "text": "Перевод термина – «nephrolithiasis» -", "options": ["боль в почке", "воспаление почки", "камни в почках", "опущение почки"], "answer": 2}, {"num": 210, "text": "Короткопалость:", "options": ["oligodactylia", "polydactylia", "brachydactylia", "syndactylia"], "answer": 2}, {"num": 211, "text": "Многопалость:", "options": ["brachydactylia", "oligodactylia", "polydactylia", "syndactylia"], "answer": 2}, {"num": 212, "text": "Обильное мочеотделение:", "options": ["anuria", "dysuria", "oliguria", "polyuria"], "answer": 3}, {"num": 213, "text": "Сужение сосуда", "options": ["angiospasmus", "angiostenosis", "angioma", "angiectasia"], "answer": 1}, {"num": 214, "text": "Опухоль хряща:", "options": ["chondromalacia", "chondrotomia", "chondroma", "chondrectomia"], "answer": 2}, {"num": 215, "text": "Раковая опухоль лимфатической железы:", "options": ["adenoma", "adenectomia", "adenocarcinoma", "lymphadenitis"], "answer": 2}, {"num": 216, "text": "Создание наружного свища (отверстия) в желчном пузыре:", "options": ["холецистотомия", "холецистэктомия", "холецистостомия", "холецистолитиаз"], "answer": 2}, {"num": 217, "text": "Камнеобразование в мочевом пузыре:", "options": ["нефролитиаз", "цистолитиаз", "холелитиаз", "уролитиаз"], "answer": 1}, {"num": 218, "text": "Выделение гноя с мочой:", "options": ["albuminuria", "glycosuria", "haematuria", "pyuria"], "answer": 3}, {"num": 219, "text": "Боль в суставе:", "options": ["arthralgia", "myalgia", "neuralgia", "podalgia"], "answer": 0}, {"num": 220, "text": "Скопление воздуха в брюшной полости:", "options": ["pyoperitoneum", "hydroperitoneum", "pneumoperitoneum", "peritonitis"], "answer": 2}, {"num": 221, "text": "Водянка околосердечной сумки:", "options": ["пневмоперикард", "гидроперикард", "перикардит", "панкардит"], "answer": 1}, {"num": 222, "text": "Потемнение мочи:", "options": ["pyuria", "uraemia", "melanuria", "bacteriuria"], "answer": 2}, {"num": 223, "text": "Переведите термин «osteomalacia»:", "options": ["воспаление костного мозга", "размягчение костей", "хроническое заболевание костей", "боль в области органа"], "answer": 1}, {"num": 224, "text": "Хроническое заболевание костей и суставов:", "options": ["osteopathia", "osteopathia", "osteoarthropathia", "osteoarthrosis"], "answer": 2}, {"num": 225, "text": "Хроническое заболевание печени и почек:", "options": ["гепатоз", "нефроз", "гепатонефрит", "гепатонефроз"], "answer": 3}, {"num": 226, "text": "Уплотнение почечной ткани:", "options": ["nephrosclerosis", "osteosclerosis", "atherosclerosis", "arteriosclerosis"], "answer": 0}, {"num": 227, "text": "Уменьшенные размеры селезенки:", "options": ["microcolon", "microglossia", "micromastia", "microsplenia"], "answer": 3}, {"num": 228, "text": "Западение языка:", "options": ["glossalgia", "glossorrhagia", "glossoptosis", "microglossia"], "answer": 2}, {"num": 229, "text": "Опущение селезенки:", "options": ["splenoptosis", "cystoptosis", "hepatoptosis", "colpoptosis"], "answer": 0}, {"num": 230, "text": "Снимок бронхов:", "options": ["bronchospasmus", "bronchоlithus", "bronchoscopia", "bronchographia"], "answer": 3}, {"num": 231, "text": "Сужение слепой кишки:", "options": ["laryngostenosis", "pylorostenosis", "typhlostenosis", "ureterostenosis"], "answer": 2}, {"num": 232, "text": "Термин со значением «водянка глаза»", "options": ["hydrothorax", "hydrocephalia", "hydrarthrosis", "hydrophthalmus"], "answer": 3}, {"num": 233, "text": "Паралич мышц языка:", "options": ["гастроплегия", "глоссоплегия", "офтальмоплегия", "цистоплегия"], "answer": 1}, {"num": 234, "text": "Неполное количество пальцев:", "options": ["олигодактилия", "олигодонтия", "олигофалангия", "олигофрения"], "answer": 0}, {"num": 235, "text": "Наложение шва на селезенку:", "options": ["colporrhaphia", "laparorrhaphia", "pneumonorrhaphia", "splenorrhaphia"], "answer": 3}, {"num": 236, "text": "Расширение лимфатических сосудов:", "options": ["angiectasia", "bronchectasia", "gastrectasia", "lymphangiectasia"], "answer": 3}, {"num": 237, "text": "Размягчение спинного мозга", "options": ["encephalomalacia", "chondromalacia", "myelomalacia", "osteomalacia"], "answer": 2}, {"num": 238, "text": "Кровотечение после удаления зуба:", "options": ["colporrhagia", "odontorrhagia", "ophthalmorrhagia", "otorrhagia"], "answer": 1}, {"num": 239, "text": "Венозный застой:", "options": ["haemostasis", "hypostasis", "lymphostasis", "phlebostasis"], "answer": 3}, {"num": 240, "text": "Затруднение отхождения желчи:", "options": ["cholestasis", "haemostasis", "lymphostasis", "urostasis"], "answer": 0}, {"num": 241, "text": "Злокачественного происхождения:", "options": ["cardiogenus", "oncogenus", "pyogenus", "urogenus"], "answer": 1}, {"num": 242, "text": "Повышенное содержание эритроцитов в крови:", "options": ["erythropoёsis", "erythropenia", "erythrocytosis", "erythrocyturia"], "answer": 2}, {"num": 243, "text": "Нарушение питания костной ткани:", "options": ["osteomalacia", "osteodystrophia", "osteotomia", "osteosynthesis"], "answer": 1}, {"num": 244, "text": "Боль в прямой кишке:", "options": ["cardialgia", "gastralgia", "glossalgia", "proctalgia"], "answer": 3}, {"num": 245, "text": "Боль в стопе:", "options": ["cephalgia", "myalgia", "otalgia", "podalgia"], "answer": 3}, {"num": 246, "text": "Кровоизлияние в почку:", "options": ["angioneurosis", "haematonephrosis", "haemarthrosis", "haematuria"], "answer": 1}, {"num": 247, "text": "Зашивание вен:", "options": ["phlebotomia", "phlebectomia", "phlebitis", "phleborhaphia"], "answer": 3}, {"num": 248, "text": "Затвердевание почечной ткани:", "options": ["cardiosclerosis", "otosclerosis", "nephrosclerosis", "pneumosclerosis"], "answer": 2}, {"num": 249, "text": "Cкопление гноя в маточной трубе:", "options": ["pyogenus", "pyometra", "pyothorax", "pyosalping"], "answer": 3}, {"num": 250, "text": "Наложение шва на легкое:", "options": ["hysterorraphia", "nephrorrhaphia", "pneumonorrhaphia", "splenorrhaphia"], "answer": 2}, {"num": 251, "text": "Содержание глюкозы в крови:", "options": ["гликемия", "гипогликемия", "гипергликемия", "гликолиз"], "answer": 0}, {"num": 252, "text": "Повышенное содержание сахара в крови:", "options": ["glycaemia", "hypoglykaemia", "hyperglykaemia", "glycolysis"], "answer": 2}, {"num": 253, "text": "Фиксация матки при ее выпадении:", "options": ["colopexia", "nephropexia", "hysteropexia", "proctopexia"], "answer": 2}, {"num": 254, "text": "Фиксация прямой кишки при ее выпадении:", "options": ["colopexia", "nephropexia", "hysteropexia", "proctopexia"], "answer": 3}, {"num": 255, "text": "Значение терминоэлемента “poly-“", "options": ["сходный, одинаковый", "сам, тот же самый", "другой, иной, различный", "многочисленный, множественный"], "answer": 3}, {"num": 256, "text": "Термин со значением «свищ»:", "options": ["ectomia", "tomia", "stoma", "stomia"], "answer": 3}, {"num": 257, "text": "Термин со значением «сшивание сосудов»:", "options": ["angiographia", "angiorrhaphia", "angioplastica", "angioma"], "answer": 1}, {"num": 258, "text": "Термин со значением «фиксация почки»:", "options": ["nephrostomia", "nephritis", "nephrotomia", "nephropexia"], "answer": 3}, {"num": 259, "text": "Обнаружение сахара в моче:", "options": ["albuminuria", "bacteriuria", "glucosuria", "haematuria"], "answer": 2}, {"num": 260, "text": "Паралич одной конечности:", "options": ["hemiplegia", "monoplegia", "panplegia"], "answer": 1}, {"num": 261, "text": "Воспаление всех слоев сердца:", "options": ["endocarditis", "myocarditis", "pancarditis", "pericarditis"], "answer": 2}, {"num": 262, "text": "Расширение почечной лоханки:", "options": ["pyelectasia", "pyelostenosis", "pyelonephritis", "pyelitis"], "answer": 0}, {"num": 263, "text": "Воспаление околопочечной ткани:", "options": ["paracystitis", "paranephritis", "parametritis", "parauretritis"], "answer": 1}, {"num": 264, "text": "Термин со значением “железистая клетка”:", "options": ["adenocytus", "chondrocytus", "hepatocytus", "myelocytus"], "answer": 0}, {"num": 265, "text": "Увеличение размеров губ:", "options": ["macroglossia", "macromastia", "macrocheilia", "macrogenia"], "answer": 2}, {"num": 266, "text": "Опущение влагалища:", "options": ["colpitis", "colposcopia", "colpoptosis", "colporrhaphia"], "answer": 2}, {"num": 267, "text": "Воспаление (слизистой) носоглотки:", "options": ["отит", "ринит", "фарингит", "ринофарингит"], "answer": 3}, {"num": 268, "text": "Вставьте пропущенную часть термина hypox ...пониженное содержание О2 в крови:", "options": ["–uria", "–algia", "–aemia", "–ergia"], "answer": 2}, {"num": 269, "text": "Одновременное воспаление нескольких нервов:", "options": ["neuritis", "mononeuritis", "panneuritis", "polyneuritis"], "answer": 3}, {"num": 270, "text": "Опухоль нервной ткани:", "options": ["ангиома", "гематома", "неврома", "остеома"], "answer": 2}, {"num": 271, "text": "Переведите термин “chondromalacia”:", "options": ["размягчение кости", "размягчение костного мозга", "размягчение роговицы", "размягчение хряща"], "answer": 3}, {"num": 272, "text": "Искусственное охлаждение организма:", "options": ["термометрия", "гипотермия", "гипертермия", "термоплегия"], "answer": 1}, {"num": 273, "text": "Неполное количество пальцев на руке или ноге:", "options": ["macrodactylia", "oligodactylia", "polydactylia", "syndactylia"], "answer": 1}, {"num": 274, "text": "Увеличение размеров печени и селезёнки:", "options": ["hepatomegalia", "splenomegalia", "microsplenia", "hepatosplenomegalia"], "answer": 3}, {"num": 275, "text": "Допишите недостающую часть термина ...arthritis – воспаление тканей вокруг сустава:", "options": ["pan–", "peri–", "poly–", "mono–"], "answer": 1}, {"num": 276, "text": "Последовательность терминоэлементов в термине «нарушение питания сердечной мышцы»", "options": ["myocardiodystrophia", "cardiomyodystrophia", "dystrophiamyocardio", "trophiadysmyocardio"], "answer": 1}, {"num": 277, "text": "Найдите термин «корь» -", "options": ["morbilli", "cancer", "icterus", "tetanus"], "answer": 0}, {"num": 278, "text": "Очаг омертвения вследствие стойкого отсутствия притока крови – это:", "options": ["infarctus", "insultus", "collapsus", "prolapsus"], "answer": 0}, {"num": 279, "text": "Расширение легких воздухом:", "options": ["empyema", "emphysema", "eczema", "erythema"], "answer": 1}, {"num": 280, "text": "Какой термин обозначает «выслушивание» -", "options": ["palpatio", "auscultatio", "percussio", "reanimatio"], "answer": 1}, {"num": 281, "text": "Какой термин обозначает «ощупывание»:", "options": ["auscultatio", "curatio", "palpatio", "percussio"], "answer": 2}, {"num": 282, "text": "Найдите термин, обозначающий «усиленный приток крови:", "options": ["anaemia", "glycaemia", "hyperaemia", "hypoxia"], "answer": 2}, {"num": 283, "text": "Подберите недостающую часть термина - … uria – cкудное выделение мочевыделения:", "options": ["an –", "dys–", "poly –", "oligo –"], "answer": 3}, {"num": 284, "text": "Термин со значением «истечение гноя»:", "options": ["diarrhoea", "galactorrhoea", "rhinorrhoea", "pyorrhoea e) otorrhoea"], "answer": 3}, {"num": 285, "text": "Воспаление гортани:", "options": ["bronchitis", "laryngitis", "pharyngitis", "rhinitis"], "answer": 1}, {"num": 286, "text": "Найдите перевод термина “Ileus, i, m “:", "options": ["подвздошная кишка", "кишечник", "кишечная непроходимость", "спазм кишечника"], "answer": 2}, {"num": 287, "text": "Найдите перевод термина “icterus, i, m”:", "options": ["бешенство", "желтуха", "столбняк", "чесотка"], "answer": 1}, {"num": 288, "text": "Найдите перевод термина “ tetanus, i, m”:", "options": ["желтуха", "спазм", "столбняк", "чесотка"], "answer": 2}, {"num": 289, "text": "Повышение внутриглазного давления обозначается термином:", "options": ["глаукома", "катаракта", "кома", "трахома"], "answer": 0}, {"num": 290, "text": "Укажите последовательность слов в термине “эмболия легочной артерии”", "options": ["embolia arteriae pulmonalis", "arteriae pulmonalis embolia", "pulmonalis embolia arteriae"], "answer": 0}, {"num": 291, "text": "Укажите последовательность слов в термине “неврит бедренного нерва”:", "options": ["neuritis nervi femoralis", "nervi femoralis neuritis", "femoralis nervi neuritis"], "answer": 0}, {"num": 292, "text": "Укажите последовательность слов в термине “лечение злокачественной опухоли”:", "options": ["curatio tumoris maligni", "maligni curatio tumoris", "tumoris curatio tumoris"], "answer": 0}, {"num": 293, "text": "Укажите последовательность слов в термине “перелом костей правой стопы”:", "options": ["fractura ossium pedis dextri", "ossium fractura pedis dextri", "pedis fractura ossium dextri", "dextri fractura ossium pedis"], "answer": 0}, {"num": 294, "text": "Последовательность слов в термине “Синдром малого затылочного нерва”:", "options": ["Syndromum nervi occipitalis minoris", "Syndromum nervi minoris occipitalis", "Syndromum occipitalis nervi minoris", "Syndromum minoris occipitalis nervi"], "answer": 0}, {"num": 295, "text": "Укажите последовательность слов в термине “лечение острого распространенного фурункулеза”:", "options": ["сuratio furunculosis polytopicae acutae", "сuratio furunculosis acutae polytopicae", "сuratio polytopicae acutae furunculosis", "сuratio acutae furunculosis polytopicae"], "answer": 0}, {"num": 296, "text": "Укажите последовательность слов в термине “лечение ишемической болезни сердца ”:", "options": ["curatio morbi ischaemici cordis", "curatio morbi cordis ischaemici", "curatio ischaemici morbi cordis", "curatio cordis ischaemici morbi"], "answer": 0}, {"num": 297, "text": "Укажите последовательность слов в термине “признаки гиперплазии почечной артерии”:", "options": ["symptomata hyperlasiae arteriae renalis", "hyperlasiae renalis symptomata arteriae", "arteriae renalis hyperlasiae symptomata", "renalis hyperlasiae symptomata arteriae"], "answer": 0}, {"num": 298, "text": "Укажите последовательность слов в термине “лечение острой долевой пневмонии”:", "options": ["curatio pneumoniae lobularis acutae", "curatio pneumoniae acutae lobularis", "lobularis curatio pneumoniae acutae", "acutae curatio pneumoniae lobularis"], "answer": 0}, {"num": 299, "text": "Укажите последовательность слов в термине “лечение острого аллергического ринита”:", "options": ["curatio rhinitis allergicae acutae", "curatio allergicae acutae rhinitis", "allergicae curatio acutae rhinitis", "curatio acutae rhinitis allergicae"], "answer": 0}, {"num": 300, "text": "Выберите препарат женских половых гормонов:", "options": ["Aethinyloestradiolum", "Hydrocortisonum", "Euthyrox", "Testoenatum 1"], "answer": 0}]};
+const ALL = DATA.questions;
+const EXAM_SIZE = 20;
+let mode = 'train', queue = [], idx = 0, correct = 0, wrong = [], picks = [];
+
+const el = (id) => document.getElementById(id);
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function toMenu() {
+  el('menu').style.display = 'block';
+  el('quiz').style.display = 'none';
+  el('done').style.display = 'none';
+}
+
+// ── переход к любому вопросу ──
+function buildJump() {
+  const g = el('jumpgrid');
+  g.innerHTML = '';
+  queue.forEach((q, k) => {
+    const b = document.createElement('button');
+    b.textContent = q.num;
+    b.dataset.k = k;
+    b.onclick = () => goTo(k);
+    g.appendChild(b);
+  });
+  markJump();
+}
+
+function markJump() {
+  const g = el('jumpgrid');
+  if (!g) return;
+  [...g.children].forEach((b) => b.classList.toggle('cur', Number(b.dataset.k) === idx));
+}
+
+function goTo(k) {
+  if (k < 0 || k >= queue.length) return;
+  clearTimeout(window.__adv);
+  idx = k;
+  render();
+}
+
+function start(m) {
+  mode = m;
+  clearTimeout(window.__adv);
+  queue = (m === 'exam') ? shuffle(ALL).slice(0, Math.min(EXAM_SIZE, ALL.length)) : shuffle(ALL);
+  idx = 0; correct = 0; wrong = []; picks = [];
+  el('menu').style.display = 'none';
+  el('done').style.display = 'none';
+  el('quiz').style.display = 'block';
+  buildJump();
+  render();
+}
+
+function render() {
+  const q = queue[idx];
+  el('qpos').textContent = 'Вопрос ' + (idx + 1) + ' из ' + queue.length;
+  el('score').textContent = mode === 'exam' ? 'Отвечено: ' + picks.length : 'Правильно: ' + correct;
+  el('pbar').style.width = (idx / queue.length * 100) + '%';
+  el('next').disabled = true;
+  el('status').textContent = '';
+  markJump();
+  const card = el('card');
+  card.innerHTML = '<div class="qnum">№ ' + q.num + '</div><div class="qtext"></div>';
+  card.querySelector('.qtext').textContent = q.text;
+  q.options.forEach((opt, k) => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = opt;
+    b.onclick = () => pick(b, k, q);
+    card.appendChild(b);
+  });
+}
+
+function pick(btn, k, q) {
+  const buttons = [...document.querySelectorAll('.opt')];
+  buttons.forEach(b => b.disabled = true);
+  picks.push(k);
+
+  const right = q.answer;
+  if (mode === 'train') {
+    if (right >= 0) {
+      buttons[right].classList.add('ok');
+      buttons[right].insertAdjacentHTML('beforeend', '<span class="mark">✓</span>');
+    }
+    if (k === right) { correct++; el('status').textContent = 'Верно ✓'; }
+    else {
+      btn.classList.add('bad');
+      btn.insertAdjacentHTML('beforeend', '<span class="mark">✗</span>');
+      el('status').textContent = right >= 0 ? 'Неверно ✗' : 'Ответ не размечен';
+    }
+    el('score').textContent = 'Правильно: ' + correct;
+  } else {
+    // экзамен: без подсказок
+    btn.classList.add('picked');
+    el('status').textContent = 'Отвечено · далее…';
+    if (k !== right) wrong.push({q, k});
+  }
+
+  el('next').disabled = false;
+  clearTimeout(window.__adv);
+  window.__adv = setTimeout(() => { if (!el('next').disabled) el('next').click(); }, 1000);
+}
+
+el('next').onclick = () => {
+  clearTimeout(window.__adv);
+  if (idx < queue.length - 1) { idx++; render(); }
+  else { finish(); }
+};
+
+// кнопка «Список вопросов»
+el('toggleJump').onclick = () => {
+  const g = el('jumpgrid');
+  g.style.display = (g.style.display === 'none') ? 'grid' : 'none';
+};
+
+// переход по номеру вопроса
+el('goNum').onclick = () => {
+  const n = parseInt(el('jumpNum').value, 10);
+  if (!n) return;
+  const k = queue.findIndex((q) => q.num === n);
+  if (k >= 0) { goTo(k); el('jumpNum').value = ''; }
+  else { el('status').textContent = 'Вопроса №' + n + ' нет в этом списке'; }
+};
+el('jumpNum').addEventListener('keydown', (e) => { if (e.key === 'Enter') el('goNum').click(); });
+
+function finish() {  el('quiz').style.display = 'none';
+  el('done').style.display = 'block';
+  el('pbar').style.width = '100%';
+  const total = queue.length;
+  const rights = mode === 'exam' ? (total - wrong.length) : correct;
+  el('finalScore').textContent = rights + ' / ' + total;
+  el('finalPct').textContent = Math.round(rights / total * 100) + '% правильных' +
+      (mode === 'exam' ? ' · экзамен' : ' · тренировка');
+
+  const rev = el('review');
+  rev.innerHTML = '';
+  if (mode === 'exam' && wrong.length) {
+    const h = document.createElement('h3');
+    h.textContent = 'Ошибки (' + wrong.length + '):';
+    rev.appendChild(h);
+    wrong.forEach(({q, k}) => {
+      const it = document.createElement('div');
+      it.className = 'item';
+      it.innerHTML = '<div class="q"></div><div class="a"></div><div class="b"></div>';
+      it.querySelector('.q').textContent = '№ ' + q.num + '. ' + q.text;
+      it.querySelector('.a').textContent = 'Ваш ответ: ' + (q.options[k] || '—');
+      it.querySelector('.b').textContent = 'Правильно: ' + (q.answer >= 0 ? q.options[q.answer] : 'не размечено');
+      rev.appendChild(it);
+    });
+  }
+}
+
+</script>
+</body>
+</html>

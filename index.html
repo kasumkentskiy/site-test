@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f2742">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>Тесты — выбери предмет</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;color:#e7ecf7;
+    background:
+      radial-gradient(1000px 600px at 15% -10%,rgba(96,165,250,.16),transparent 60%),
+      radial-gradient(900px 600px at 90% 0%,rgba(192,132,252,.14),transparent 60%),
+      radial-gradient(800px 500px at 50% 110%,rgba(74,222,128,.12),transparent 60%),
+      linear-gradient(160deg,#0b1023 0%,#141b38 100%);
+    display:flex;flex-direction:column;align-items:center;padding:56px 20px 70px}
+  .badge{display:inline-block;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#9aa5c0;
+    border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 14px;margin-bottom:18px;background:rgba(255,255,255,.04)}
+  h1{font-size:clamp(32px,5vw,48px);font-weight:700;letter-spacing:-.02em;margin-bottom:10px;text-align:center}
+  .lead{color:#9aa5c0;margin-bottom:40px;text-align:center;max-width:520px;line-height:1.5}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;width:100%;max-width:900px}
+  a.card{display:block;text-decoration:none;color:inherit;background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:22px;transition:.18s;position:relative;overflow:hidden}
+  a.card:hover{transform:translateY(-3px);background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.24)}
+  a.card .dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px}
+  a.card h2{font-size:20px;margin-bottom:8px;display:flex;align-items:center}
+  a.card .cnt{color:#9aa5c0;font-size:14px}
+  a.card .arrow{position:absolute;right:20px;bottom:18px;font-size:20px;opacity:.35}
+  footer{margin-top:42px;color:#5f6b86;font-size:13px}
+  @media(max-width:520px){
+    body{padding:34px 14px 50px}
+    h1{font-size:30px}
+    .lead{font-size:14px;margin-bottom:26px}
+    .grid{grid-template-columns:1fr;gap:14px}
+    a.card{padding:18px;border-radius:16px}
+    a.card h2{font-size:18px}
+    a.card .cnt{font-size:13px}
+  }
+</style>
+</head>
+<body>
+  <div class="badge">Дербентский медицинский колледж</div>
+  <h1>Тесты — выбери предмет</h1>
+  <p class="lead">Тренировка по всем вопросам или экзамен из 20 случайных.</p>
+  <div class="grid"><a class="card" href="Анатомия.html">
+  <h2><span class="dot" style="background:#60a5fa"></span>Анатомия</h2>
+  <div class="cnt">287 вопросов · экзамен 20</div>
+  <div class="arrow">→</div>
+</a>
+<a class="card" href="Латинский.html">
+  <h2><span class="dot" style="background:#c084fc"></span>Латинский</h2>
+  <div class="cnt">295 вопросов · экзамен 20</div>
+  <div class="arrow">→</div>
+</a>
+<a class="card" href="Мдк.html">
+  <h2><span class="dot" style="background:#4ade80"></span>Мдк</h2>
+  <div class="cnt">293 вопросов · экзамен 20</div>
+  <div class="arrow">→</div>
+</a>
+<a class="card" href="ПМ01.html">
+  <h2><span class="dot" style="background:#fbbf24"></span>ПМ01</h2>
+  <div class="cnt">298 вопросов · экзамен 20</div>
+  <div class="arrow">→</div>
+</a></div>
+  <footer>Всего вопросов: 1173</footer>
+</body>
+</html>
